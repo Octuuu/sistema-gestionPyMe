@@ -8,9 +8,8 @@ export default function SaleForm() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    cliente: "",
+    clienteId: "",
     productos: [],
-    total: 0,
   });
 
   const [alert, setAlert] = useState({ message: "", type: "" });
@@ -22,7 +21,7 @@ export default function SaleForm() {
   const handleAddProduct = () => {
     setForm({
       ...form,
-      productos: [...form.productos, { nombre: "", cantidad: 1, precio: 0 }],
+      productos: [...form.productos, { productoId: "", cantidad: 1 }],
     });
   };
 
@@ -35,8 +34,7 @@ export default function SaleForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación de campos
-    if (!form.cliente || form.productos.length === 0) {
+    if (!form.clienteId || form.productos.length === 0) {
       setAlert({
         message: "Todos los campos son obligatorios, especialmente los productos.",
         type: "error",
@@ -45,22 +43,22 @@ export default function SaleForm() {
     }
 
     const saleData = {
-      cliente: form.cliente,
-      productos: form.productos,
-      total: form.productos.reduce(
-        (total, product) => total + product.cantidad * product.precio,
-        0
-      ),
+      clienteId: parseInt(form.clienteId),
+      productos: form.productos
+        .filter(p => p.productoId && p.cantidad)
+        .map(p => ({
+          productoId: parseInt(p.productoId),
+          cantidad: parseInt(p.cantidad)
+        })),
     };
+    
 
     try {
       await createSale(saleData, token);
-      setAlert({
-        message: "Venta creada con éxito!",
-        type: "success",
-      });
+      setAlert({ message: "Venta creada con éxito!", type: "success" });
       navigate("/ventas");
     } catch (error) {
+      console.error(error.response?.data || error.message);
       setAlert({
         message: "Error al crear la venta. Intenta nuevamente.",
         type: "error",
@@ -87,10 +85,10 @@ export default function SaleForm() {
         )}
 
         <input
-          type="text"
-          name="cliente"
-          placeholder="Nombre del Cliente"
-          value={form.cliente}
+          type="number"
+          name="clienteId"
+          placeholder="ID del Cliente"
+          value={form.clienteId}
           onChange={handleChange}
           className="mb-4 w-full p-2 border rounded"
         />
@@ -100,12 +98,12 @@ export default function SaleForm() {
           {form.productos.map((producto, index) => (
             <div key={index} className="flex space-x-2 mb-2">
               <input
-                type="text"
-                name="nombre"
-                placeholder="Producto"
-                value={producto.nombre}
+                type="number"
+                name="productoId"
+                placeholder="ID del Producto"
+                value={producto.productoId}
                 onChange={(e) => handleProductChange(index, e)}
-                className="p-2 border rounded w-1/3"
+                className="p-2 border rounded w-1/2"
               />
               <input
                 type="number"
@@ -113,15 +111,7 @@ export default function SaleForm() {
                 placeholder="Cantidad"
                 value={producto.cantidad}
                 onChange={(e) => handleProductChange(index, e)}
-                className="p-2 border rounded w-1/3"
-              />
-              <input
-                type="number"
-                name="precio"
-                placeholder="Precio"
-                value={producto.precio}
-                onChange={(e) => handleProductChange(index, e)}
-                className="p-2 border rounded w-1/3"
+                className="p-2 border rounded w-1/2"
               />
             </div>
           ))}

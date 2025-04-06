@@ -34,8 +34,8 @@ export default function ClientList() {
         </button>
       </div>
 
-      <table className="w-full bg-white border shadow-md">
-        <thead className="bg-gray-100">
+      <table className="w-full border shadow-md">
+        <thead className="">
           <tr>
             <th className="p-2">Nombre</th>
             <th className="p-2">Email</th>

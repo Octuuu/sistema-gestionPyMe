@@ -34,8 +34,8 @@ export default function ProductList() {
         </button>
       </div>
 
-      <table className="w-full border bg-white shadow-md">
-        <thead className="bg-gray-100">
+      <table className="w-full border">
+        <thead className="">
           <tr>
             <th className="p-2">Nombre</th>
             <th className="p-2">Precio</th>
